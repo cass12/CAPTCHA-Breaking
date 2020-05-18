@@ -61,6 +61,7 @@ labels = np.array(labels)
 lb = LabelBinarizer().fit(labels) #training on the labels
 binary_class_encoder = lb.transform(labels) #encodes each label into a vector for its specific class 
 
+#A simple CNN Sequential architecture with one in/out tensor
 nr_classes = len(set(labels))
 my_model = Sequential 
 model.add(Conv2D(20, (3,3), padding = "same", input(20,20,1), activation = "relu" )) 
