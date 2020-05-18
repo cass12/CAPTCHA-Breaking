@@ -1,3 +1,6 @@
+# Preprocessing the images using OpenCV2
+# Extracting single character images from a 4 characters CAPTCHA image
+
 import os
 import cv2
 import numpy as np
