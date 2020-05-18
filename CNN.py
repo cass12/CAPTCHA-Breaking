@@ -6,6 +6,10 @@ import os
 import imutils
 from imutils import paths
 from sklearn.preprocessing import LabelBinarizer
+from tensorflow.keras import backend
+from keras.models import Sequential
+from keras.layers.convolutional import Conv2D, MAXPooling2D
+from keras.layers.core import Flatten, Dense 
 
 def read_img(image):
     return cv2.imread(character_image)
@@ -55,4 +59,14 @@ bw_to_binary = np.array(imgs, dtype=object)/255.0 #binarizing the colours
 labels = np.array(labels)
 
 lb = LabelBinarizer().fit(labels) #training on the labels
-Y = lb.transform(labels) #encodes each label into a vector for its specific class 
+binary_class_encoder = lb.transform(labels) #encodes each label into a vector for its specific class 
+
+nr_classes = len(set(labels))
+my_model = Sequential 
+model.add(Conv2D(20, (3,3), padding = "same", input(20,20,1), activation = "relu" )) 
+model.add(MAXPooling2D(pool_size = (2,2), strides = (2,2)))
+model.add(Conv2D(50, (3,3), padding = "same", input(20,20,1), activation = "relu")) 
+model.add(MAXPooling2D(pool_size = (2,2), strides = (2,2))) 
+model.add(Flatten()) 
+model.add(Dense(384, activation = "relu")) 
+model.add(Dense(nr_classes, activation = "softmax"))
