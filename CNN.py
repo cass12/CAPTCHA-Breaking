@@ -63,11 +63,15 @@ binary_class_encoder = lb.transform(labels) #encodes each label into a vector fo
 
 #A simple CNN Sequential architecture with one in/out tensor
 nr_classes = len(set(labels))
-my_model = Sequential 
-my_model.add(Conv2D(20, (3,3), padding = "same", input(20,20,1), activation = "relu" )) 
-my_model.add(MAXPooling2D(pool_size = (2,2), strides = (2,2)))
-my_model.add(Conv2D(50, (3,3), padding = "same", input(20,20,1), activation = "relu")) 
-my_model.add(MAXPooling2D(pool_size = (2,2), strides = (2,2))) 
+my_model = Sequential() 
+my_model.add(Conv2D(20, (3,3), padding = "same", input_shape=(20,20,1), activation = "relu" )) 
+my_model.add(MaxPooling2D(pool_size = (2,2), strides = (2,2)))
+my_model.add(Conv2D(50, (3,3), padding = "same", activation = "relu")) 
+my_model.add(MaxPooling2D(pool_size = (2,2), strides = (2,2))) 
 my_model.add(Flatten()) 
 my_model.add(Dense(384, activation = "relu")) 
 my_model.add(Dense(nr_classes, activation = "softmax"))
+
+my_model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
+my_model.summary()
+
