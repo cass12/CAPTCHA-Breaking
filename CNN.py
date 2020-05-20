@@ -10,6 +10,8 @@ from tensorflow.keras import backend
 from keras.models import Sequential
 from keras.layers.convolutional import Conv2D, MAXPooling2D
 from keras.layers.core import Flatten, Dense 
+from sklearn.model_selection import train_test_split 
+
 
 def read_img(image):
     return cv2.imread(character_image)
@@ -75,3 +77,9 @@ my_model.add(Dense(nr_classes, activation = "softmax"))
 my_model.compile(optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"])
 my_model.summary()
 
+#A nice way of displaying the architecture
+from ann_visualizer.visualize import ann_viz 
+ann_viz(my_model, title="The CNN Architecture")
+
+X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.3, shuffle=True)
+my_model.fit(X_train, y_train, validation_data=(X_test, y_test), batch_size=32, epochs=11)
