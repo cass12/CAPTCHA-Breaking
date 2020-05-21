@@ -11,6 +11,7 @@ from keras.models import Sequential
 from keras.layers.convolutional import Conv2D, MAXPooling2D
 from keras.layers.core import Flatten, Dense 
 from sklearn.model_selection import train_test_split 
+import pickle
 
 
 def read_img(image):
@@ -83,3 +84,10 @@ ann_viz(my_model, title="The CNN Architecture")
 
 X_train, X_test, y_train, y_test = train_test_split(X,y, test_size=0.3, shuffle=True)
 my_model.fit(X_train, y_train, validation_data=(X_test, y_test), batch_size=32, epochs=11)
+
+
+#serializing model and label binarizer
+my_model.save_weights("myModelWeights.h5") 
+f = open("my_lb.pickle","wb")
+f.write(pickle.dumps(lb))
+f.close()
