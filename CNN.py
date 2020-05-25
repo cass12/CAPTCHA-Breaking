@@ -14,13 +14,18 @@ from sklearn.model_selection import train_test_split
 import pickle
 
 
-def read_img(image):
-    return cv2.imread(character_image)
+def read_img(image): 
+    image_to_array = cv2.imread(image)
+    return image_to_array
 
 def display_img(image):
     cv2.imshow('Characters', image)
     cv2.waitKey(0)
     cv2.destroyAllWindows
+    
+def grayscale(image): 
+    gray = cv2.cvtColor(image,cv2.COLOR_BGR2GRAY)
+    return gray
 
 def normalize_img(image, new_width=20, new_height=20):
     #define image dims
@@ -36,22 +41,20 @@ def normalize_img(image, new_width=20, new_height=20):
     white = [255,255,255]
     img_with_border = cv2.copyMakeBorder(image, h_padding, h_padding, w_padding, w_padding, cv2.BORDER_CONSTANT, value = white)
     img_border_resized = cv2.resize (image, (new_width, new_height), interpolation = cv2.INTER_AREA)
-    return img_with_border
+    return img_border_resized
 
-#keras requires 4 dims
-def resize_to_keras(image):
-    return np.expand_dims(image, axis=2)
+#keras requires 4 dims 
+def resize_to_keras(normalized_image): 
+    to_keras = np.expand_dims(normalized_image, axis=2)
+    return to_keras
 
-imgs = []
+imgs = [] 
 labels = []
-extracted_characters_folder = "/home/cas/Desktop/extracted_characters"
-for character_image in paths.list_images(extracted_characters_folder):
-    print(character_image)
-    single_character = read_img(extracted_characters_folder)
-    #display_img(single_character)
-    grayscaled = grayscale_img(single_character)
-    normalized = normalize_img(grayscaled)
-    #display_img(normalized)
+extracted_characters_folder = "/home/cas/Desktop/Licenta_App/extracted_chars1" 
+for character_image in paths.list_images(extracted_characters_folder): 
+    single_character = read_img(character_image) 
+    grayscaled = grayscale(single_character) 
+    normalized = normalize_img(grayscaled) 
     keras_img = resize_to_keras(normalized)
     imgs.append(keras_img)
     label = character_image.split(os.path.sep)[-2]
