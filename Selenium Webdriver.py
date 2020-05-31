@@ -3,9 +3,10 @@ import cv2
 import imutils
 import numpy as np 
 import pickle 
+import time 
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
-import time 
+import urllib.request 
 import tensorflow.keras.backend
 from keras.models import Sequential
 from keras.layers.convolutional import Conv2D, MaxPooling2D
@@ -155,10 +156,7 @@ def predict(single_chars, model, lb):
 #get the previously calculated model weights  
 model, lb = load_model_and_lb()
 
-from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-import urllib.request 
-
+#the actual webdriver, for now it generates 403 forbidden error code
 options = webdriver.ChromeOptions()
 options.add_argument("--start-maximized")
 driver = webdriver.Chrome(ChromeDriverManager().install(),options=options) 
