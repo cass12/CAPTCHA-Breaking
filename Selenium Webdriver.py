@@ -4,9 +4,9 @@ import imutils
 import numpy as np 
 import pickle 
 import time 
+import requests
 from selenium import webdriver
-from webdriver_manager.chrome import ChromeDriverManager
-import urllib.request 
+from webdriver_manager.chrome import ChromeDriverManager 
 import tensorflow.keras.backend
 from keras.models import Sequential
 from keras.layers.convolutional import Conv2D, MaxPooling2D
@@ -101,9 +101,9 @@ def resize_to_keras(normalized_image):
     to_keras = np.expand_dims(normalized_image, axis=2)
     return to_keras
 
-#perform all the steps from preprocessing in a new method to get a single char from captcha img
-def image_preprocessing_pipeline(captcha_image): 
-    captcha_img = read_img(captcha)
+#perform all the steps from preprocessing in a new method to get a single character from the captcha img
+def image_preprocessing(captcha_image): 
+    captcha_img = read_img(captcha_image)
     grayscaled_img = grayscale(captcha_img)
     thresholded_img = threshold(grayscaled_img)
     dilated_img = dilate(thresholded_img)
@@ -111,9 +111,9 @@ def image_preprocessing_pipeline(captcha_image):
     bounding_rectangles = get_ROI(contours)
     splitted_chars = split_chars(bounding_rectangles)
     splitted_chars = sort_ROI(splitted_chars)
-    single_chars = extract_single_choptions = webdriver.ChromeOptions()
+    single_chars = extract_single_char(captcha_img,splitted_chars)
     return single_chars
-
+        
 def load_model_weights(): 
     nr_classes = 32
     my_model = Sequential() 
@@ -125,8 +125,8 @@ def load_model_weights():
     my_model.add(Dense(512, activation = "relu")) 
     my_model.add(Dense(nr_classes, activation = "softmax"))
     
-    loaded_model = my_model.load_weights("myModelWeights.h5")
-    return loaded_model
+    my_model.load_weights("myModelWeights.h5")
+    return my_model
     
 #load the label binarizer for classes   
 def load_LB(): 
@@ -143,41 +143,38 @@ def predict(single_chars, model, lb):
     X = [] 
     for single_char_img in single_chars: 
         grayscaled = grayscale(single_char_img) 
-        normalized = normalize_img(single_char_img)
+        normalized = normalize_img(grayscaled)
         keras_img = resize_to_keras(normalized) 
-    X.append(keras_img) 
+        X.append(keras_img)   
     #binarize the keras imgs 
     X = np.array(X, dtype = "float")/255.0 
     prediction = model.predict(X) 
     #Transform binary labels back to multi-class labels
     predicted_char = lb.inverse_transform(prediction)
     return predicted_char 
+
     
 #get the previously calculated model weights  
 model, lb = load_model_and_lb()
 
-#the actual webdriver, for now it generates 403 forbidden error code
 options = webdriver.ChromeOptions()
 options.add_argument("--start-maximized")
 driver = webdriver.Chrome(ChromeDriverManager().install(),options=options) 
 
-driver.get("http://mycaptchagenerator.c1.biz/captcha-if-you-can/") 
+driver.get("https://captchaifyoucan01.000webhostapp.com/captcha-if-you-can") 
 time.sleep(2)
 
-captcha_form = driver.find_element_by_css_selector("img.wpcf7-form-control") 
+for i in range (0,3):
+    captcha_form = driver.find_element_by_css_selector(".wpcf7-captcha-captcha-170")
+    src = captcha_form.get_attribute("src") # get the image source
+    captcha_img = requests.get(src)
+    with open('1.png', 'wb') as f:
+        f.write(captcha_img.content)
 
-opener=urllib.request.build_opener()
-opener.addheaders=[('User-Agent','Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/36.0.1941.0 Safari/537.36')]
-urllib.request.install_opener(opener)
-url = captcha_form.get_attribute("src") # get the image source
-local = "captcha.png"
-urllib.request.urlretrieve(url, local) #download the image with the name captcha.png
+    predicted_captcha = predict(image_preprocessing('1.png'), model, lb)
 
-predicted_captcha = predict(image_preprocessing_pipeline("captcha.png"), model, lb)
-
-submix_box = driver.find_element_by_name("captcha-170")
-submit_box.send_keys(pred)
-time.sleep(10)
+    submit_box = driver.find_element_by_name("captcha-170")
+    submit_box.send_keys(predicted_captcha)
+    submit_box.submit()
+    time.sleep(5)
 driver.quit()
-
-
