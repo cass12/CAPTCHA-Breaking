@@ -39,9 +39,9 @@ def normalize_img(image, new_width=20, new_height=20):
     h_padding = int((new_height - image.shape[0])/2)
     w_padding = int((new_width - image.shape[1])/2)
     white = [255,255,255]
-    img_with_border = cv2.copyMakeBorder(image, h_padding, h_padding, w_padding, w_padding, cv2.BORDER_CONSTANT, value = white)
-    img_border_resized = cv2.resize (image, (new_width, new_height), interpolation = cv2.INTER_AREA)
-    return img_border_resized
+    img_border = cv2.copyMakeBorder(image, h_padding, h_padding, w_padding, w_padding, cv2.BORDER_CONSTANT, value = white)
+    border_resized = cv2.resize (image, (new_width, new_height), interpolation = cv2.INTER_AREA)
+    return border_resized
 
 #keras requires 4 dims 
 def resize_to_keras(normalized_image): 
